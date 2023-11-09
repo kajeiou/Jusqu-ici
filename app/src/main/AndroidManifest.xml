@@ -21,6 +21,15 @@
 
         </activity>
 
+        <activity
+            android:name="paci.estiam.activities.logged.HomeActivity"
+            android:label="Home Activity">
+        </activity>
+        <activity
+            android:name="paci.estiam.activities.logged.UserActivity"
+            android:label="User Activity">
+        </activity>
+
 
     </application>
 

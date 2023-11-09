@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal|center_vertical"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="Connexion"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Nom d'utilisateur" />
+
+    <EditText
+        android:id="@+id/utilisateur"
+        android:layout_width="match_parent"
+        android:layout_height="130px" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Mot de passe " />
+
+    <EditText
+        android:id="@+id/motdepasse"
+        android:layout_width="match_parent"
+        android:layout_height="130px"
+        android:inputType="textPassword" />
+    <CheckBox
+        android:id="@+id/rester_connecte"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Rester connecté ?" />
+
+    <Button
+        android:id="@+id/login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="15dp"
+        android:text="S'AUTHENTIFIER" />
+
+</LinearLayout>
