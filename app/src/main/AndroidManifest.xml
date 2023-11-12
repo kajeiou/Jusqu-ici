@@ -11,8 +11,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ClassroomCommunity">
 
+
+
         <activity
-            android:name="paci.main.LoginActivity"
+            android:name="paci.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,13 +25,15 @@
         </activity>
 
         <activity
-            android:name="paci.main.activities.logged.HomeActivity"
-            android:label="Home Activity">
+            android:name="paci.main.LoginActivity"
+            android:label="Login">
         </activity>
+
         <activity
-            android:name="paci.main.activities.logged.UserActivity"
-            android:label="User Activity">
+            android:name="paci.main.activities.logged.HomeActivity"
+            android:label="Réserver une course">
         </activity>
+
 
 
     </application>

@@ -23,12 +23,28 @@
         android:gravity="center"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/viewUsers"
+    <EditText
+        android:id="@+id/editTextStart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="Voir les utilisateurs" />
+        android:hint="Point de départ"/>
+
+    <EditText
+        android:id="@+id/editTextDestination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextStart"
+        android:hint="Point d'arrivée"/>
+
+    <Button
+        android:id="@+id/buttonSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextDestination"
+        android:onClick="onSubmitClick"
+        android:text="Calculer ma course"/>
+
+
 
 
 </LinearLayout>
