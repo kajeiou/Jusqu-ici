@@ -60,8 +60,6 @@ public class HomeActivity extends AppCompatActivity {
 
 
     }
-
-
     private void displayErrorAndNavigateToMain() {
         Toast.makeText(HomeActivity.this, "Une erreur est survenue.", Toast.LENGTH_SHORT).show();
         Intent intentDisconnect = new Intent(HomeActivity.this, LoginActivity.class);

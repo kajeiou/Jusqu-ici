@@ -1,26 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal|center_vertical"
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@android:color/background_light">
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="Bienvenue sur Jusqu'ici"
         android:textSize="22sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@android:color/black" />
 
     <Button
         android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="15dp"
-        android:text="RÉSERVER UNE COURSE" />
+        android:text="RÉSERVER UNE COURSE"
+        style="@style/AppButtonStylePrimary"
+        android:layout_marginBottom="10dp" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nous rejoindre en tant que chauffeur"
+        style="@style/AppButtonStyleSecondary"
+        android:layout_marginBottom="10dp"
+        android:padding="15dp" />
 
 </LinearLayout>
