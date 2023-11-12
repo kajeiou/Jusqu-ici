@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,6 +49,13 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     editTextStart = findViewById(R.id.editTextStart);
                     editTextDestination = findViewById(R.id.editTextDestination);
+                    Button submitButton = findViewById(R.id.buttonSubmit);
+                    submitButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onSubmitClick(v);
+                        }
+                    });
 
                 } else {
                     Toast.makeText(HomeActivity.this, "User non trouvé", Toast.LENGTH_SHORT).show();
@@ -60,6 +68,8 @@ public class HomeActivity extends AppCompatActivity {
 
 
     }
+
+
     private void displayErrorAndNavigateToMain() {
         Toast.makeText(HomeActivity.this, "Une erreur est survenue.", Toast.LENGTH_SHORT).show();
         Intent intentDisconnect = new Intent(HomeActivity.this, LoginActivity.class);
