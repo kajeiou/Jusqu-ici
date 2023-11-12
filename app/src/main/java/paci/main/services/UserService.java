@@ -1,8 +1,8 @@
-package paci.estiam.services;
+package paci.main.services;
 
 import com.google.gson.JsonElement;
 
-import paci.estiam.classes.User;
+import paci.main.classes.User;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

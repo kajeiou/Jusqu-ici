@@ -1,4 +1,4 @@
-package paci.estiam.classes;
+package paci.main.classes;
 
 public class User {
 

@@ -1,4 +1,4 @@
-package paci.estiam.activities.logged;
+package paci.main.activities.logged;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -22,11 +21,11 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import paci.estiam.MainActivity;
-import paci.estiam.R;
-import paci.estiam.adapters.UserAdapter;
-import paci.estiam.classes.User;
-import paci.estiam.services.UserService;
+import paci.main.LoginActivity;
+import paci.main.R;
+import paci.main.adapters.UserAdapter;
+import paci.main.classes.User;
+import paci.main.services.UserService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -196,7 +195,7 @@ public class UserActivity extends AppCompatActivity {
 
     private void displayErrorAndNavigateToMain() {
         Toast.makeText(UserActivity.this, "Une erreur est survenue.", Toast.LENGTH_SHORT).show();
-        Intent intentDisconnect = new Intent(UserActivity.this, MainActivity.class);
+        Intent intentDisconnect = new Intent(UserActivity.this, LoginActivity.class);
         startActivity(intentDisconnect);
     }
     private void handleBackButtonClick() {

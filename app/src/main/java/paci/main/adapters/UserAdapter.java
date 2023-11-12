@@ -1,4 +1,4 @@
-package paci.estiam.adapters;
+package paci.main.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,10 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import paci.estiam.R;
+import paci.main.R;
 import java.util.List;
 
-import paci.estiam.classes.User;
+import paci.main.classes.User;
 
 public class UserAdapter extends ArrayAdapter<User> {
 

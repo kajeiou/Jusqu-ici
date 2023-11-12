@@ -10,8 +10,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ClassroomCommunity">
+
         <activity
-            android:name="paci.estiam.MainActivity"
+            android:name="paci.main.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,11 +23,11 @@
         </activity>
 
         <activity
-            android:name="paci.estiam.activities.logged.HomeActivity"
+            android:name="paci.main.activities.logged.HomeActivity"
             android:label="Home Activity">
         </activity>
         <activity
-            android:name="paci.estiam.activities.logged.UserActivity"
+            android:name="paci.main.activities.logged.UserActivity"
             android:label="User Activity">
         </activity>
 

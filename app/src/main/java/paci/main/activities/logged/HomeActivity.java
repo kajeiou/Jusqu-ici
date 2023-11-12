@@ -1,4 +1,4 @@
-package paci.estiam.activities.logged;
+package paci.main.activities.logged;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,8 +9,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import paci.estiam.MainActivity;
-import paci.estiam.R;
+import paci.main.LoginActivity;
+import paci.main.R;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -52,7 +52,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void displayErrorAndNavigateToMain() {
         Toast.makeText(HomeActivity.this, "Une erreur est survenue.", Toast.LENGTH_SHORT).show();
-        Intent intentDisconnect = new Intent(HomeActivity.this, MainActivity.class);
+        Intent intentDisconnect = new Intent(HomeActivity.this, LoginActivity.class);
         startActivity(intentDisconnect);
     }
 }

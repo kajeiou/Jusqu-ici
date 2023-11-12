@@ -1,4 +1,4 @@
-package paci.estiam;
+package paci.main;
 
 import android.content.Context;
 

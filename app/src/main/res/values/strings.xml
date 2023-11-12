@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">TP2-UsersCrud</string>
+    <string name="app_name">Jusqu-ici</string>
+    <string name="default_web_client_id">120032611856-v6uapgfd6187pgkpbg5th0erb4otdsm8.apps.googleusercontent.com</string>
+
 </resources>
