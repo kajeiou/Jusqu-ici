@@ -17,11 +17,24 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp">
 
-        <EditText
-            android:id="@+id/editTextStart"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Point de départ"/>
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editTextStart"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="Point de départ"/>
+
+            <Button
+                android:id="@+id/buttonMyLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ma position"/>
+        </LinearLayout>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -29,11 +42,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp">
 
-        <EditText
-            android:id="@+id/editTextDestination"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Point d'arrivée"/>
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/editTextDestination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Point d'arrivée"/>
+        </LinearLayout>
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
