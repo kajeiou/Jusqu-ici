@@ -3,6 +3,7 @@ package paci.main;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -118,6 +120,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void authenticate(String username, String password, boolean resterConnecte) {
+        ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+        progressDialog.setMessage("Connexion en cours...");
+        progressDialog.show();
+
         if (!username.isEmpty() && !password.isEmpty()) {
             mAuth.signInWithEmailAndPassword(username, password)
                     .addOnCompleteListener(this, task -> {
@@ -128,12 +134,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         } else {
                             Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
+                        progressDialog.dismiss();
                     });
         } else {
+            progressDialog.dismiss(); // Fermez la boîte de dialogue si les champs ne sont pas remplis
             Toast.makeText(LoginActivity.this, "Veuillez renseigner tous les champs du formulaire.", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);

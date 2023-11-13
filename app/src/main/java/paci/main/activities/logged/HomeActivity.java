@@ -229,13 +229,24 @@ public class HomeActivity extends AppCompatActivity {
             double estimatedFuelUsage = distanceInKm * fuelConsumptionRate;
 
             // Affichez les résultats avec une justification détaillée.
-            String justification = String.format("Durée estimée : %.2f minutes\n" +
-                            "Distance estimée : %.2f km\n" +
-                            "Quantité estimée de carburant : %.2f litres\n" +
-                            "Coût du trajet : %.2f euros (incluant 30 euros de rémunération pour le chauffeur)",
-                    durationInMinutes, distanceInKm, estimatedFuelUsage, totalCost);
+            // Supposons que vous avez des TextView correspondant à chaque donnée dans votre mise en page XML avec des IDs appropriés.
+            TextView durationTextView = findViewById(R.id.durationTextView);
+            TextView distanceTextView = findViewById(R.id.distanceTextView);
+            TextView fuelUsageTextView = findViewById(R.id.fuelUsageTextView);
+            TextView costTextView = findViewById(R.id.costTextView);
 
-            Toast.makeText(this, justification, Toast.LENGTH_LONG).show();
+            // Utilisez les valeurs calculées pour mettre à jour les TextView correspondants.
+                        String durationText = String.format("Durée estimée : %.2f minutes", durationInMinutes);
+                        String distanceText = String.format("Distance estimée : %.2f km", distanceInKm);
+                        String fuelUsageText = String.format("Quantité estimée de carburant : %.2f litres", estimatedFuelUsage);
+                        String costText = String.format("Coût du trajet : %.2f euros (incluant 30 euros de rémunération pour le chauffeur)", totalCost);
+
+            // Mettez à jour les TextView avec les valeurs calculées.
+                        durationTextView.setText(durationText);
+                        distanceTextView.setText(distanceText);
+                        fuelUsageTextView.setText(fuelUsageText);
+                        costTextView.setText(costText);
+
 
         } catch (Exception e) {
             e.printStackTrace();
