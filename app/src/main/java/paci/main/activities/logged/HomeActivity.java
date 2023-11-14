@@ -215,11 +215,30 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void onSubmitClick(View view) {
-        String startPoint = editTextStart.getText().toString();
-        String destination = editTextDestination.getText().toString();
+        String startPoint = editTextStart.getText().toString().trim();
+        String destination = editTextDestination.getText().toString().trim();
 
-        // Utilisez une boîte de dialogue pour permettre à l'utilisateur de choisir le type de voiture.
-        showCarTypeDialog(startPoint, destination);
+        // Vérifiez si startPoint et destination sont non null et non vides
+        if (!startPoint.isEmpty() && !destination.isEmpty()) {
+            // Utilisez une boîte de dialogue pour permettre à l'utilisateur de choisir le type de voiture.
+            showCarTypeDialog(startPoint, destination);
+        } else {
+            // Affichez un dialogue d'alerte si l'un des champs est vide
+            showAlertDialog("Veuillez remplir le point de départ et d'arrivée.");
+        }
+    }
+    private void showAlertDialog(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
+                .setTitle("Attention")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Fermez le dialogue ou faites quelque chose en conséquence
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
     private void showCarTypeDialog(final String startPoint, final String destination) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
