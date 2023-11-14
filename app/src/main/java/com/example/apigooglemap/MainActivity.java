@@ -1,6 +1,7 @@
 package com.example.apigooglemap;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -10,8 +11,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.apigooglemap.RideInfoActivity;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -123,7 +124,67 @@ public class MainActivity extends AppCompatActivity {
         String startPoint = editTextStart.getText().toString();
         String destination = editTextDestination.getText().toString();
 
-        // Utilisez l'API Directions de Google Maps pour obtenir des informations sur le trajet.
+        // Utilisez une boîte de dialogue pour permettre à l'utilisateur de choisir le type de voiture.
+        showCarTypeDialog(startPoint, destination);
+    }
+
+    private void showCarTypeDialog(final String startPoint, final String destination) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Sélectionnez le type de voiture");
+
+        // Options de voiture
+        final CharSequence[] carTypes = {"Voiture classique", "Voiture Van", "Voiture de luxe"};
+
+        builder.setItems(carTypes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String selectedCarType = carTypes[which].toString();
+
+                // Récupérez la durée estimée du trajet en minutes.
+                double durationInMinutes = getDurationInMinutes(startPoint, destination);
+
+                // Mettez à jour le coût total en fonction du type de voiture sélectionné.
+                double totalCost = calculateTotalCost(durationInMinutes, selectedCarType);
+
+                // Créez une Intent pour démarrer la nouvelle activité.
+                Intent intent = new Intent(MainActivity.this, RideInfoActivity.class);
+
+                // Passez les informations pertinentes à la nouvelle activité.
+                intent.putExtra("justification", getJustification(durationInMinutes, startPoint, destination, selectedCarType, totalCost));
+                intent.putExtra("totalCost", totalCost);
+                intent.putExtra("carType", selectedCarType); // Ajout de la catégorie de voiture sélectionnée
+
+                // Démarrez la nouvelle activité.
+                startActivity(intent);
+            }
+        });
+
+        builder.show();
+    }
+
+    private double calculateTotalCost(double durationInMinutes, String carType) {
+        // Coût par minute pour une voiture classique.
+        double driverPaymentRatePerMinute = 0.5;
+
+        // Coûts supplémentaires pour les autres types de voitures.
+        double additionalCost = 0.0;
+
+        if (carType.equals("Voiture Van")) {
+            additionalCost = 7.0;
+        } else if (carType.equals("Voiture de luxe")) {
+            additionalCost = 15.0;
+        }
+
+        // Ajoutez la rémunération du chauffeur, 30€ par heure.
+        additionalCost += (durationInMinutes / 60.0) * 30.0;
+
+        // Calcul du coût total avec les coûts supplémentaires.
+        double totalCost = durationInMinutes * driverPaymentRatePerMinute + additionalCost;
+
+        return totalCost;
+    }
+
+    private double getDurationInMinutes(String startPoint, String destination) {
         GeoApiContext geoApiContext = new GeoApiContext.Builder()
                 .apiKey("AIzaSyAz2goHIOGij1pt2zSQufKc3rQssBRMwIw")
                 .build();
@@ -138,49 +199,60 @@ public class MainActivity extends AppCompatActivity {
             // Récupérez la durée estimée du trajet en secondes.
             long durationInSeconds = result.routes[0].legs[0].duration.inSeconds;
 
-            // Convertissez la durée en minutes (au lieu d'heures).
-            double durationInMinutes = durationInSeconds / 60.0;
+            // Convertissez la durée en minutes.
+            return durationInSeconds / 60.0;
 
-            // Modifiez la tarification en conséquence (par exemple, 0.5 euros par minute).
-            double driverPaymentRatePerMinute = 0.5;
-            double totalCost = durationInMinutes * driverPaymentRatePerMinute;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Erreur lors du calcul de la durée du trajet", Toast.LENGTH_SHORT).show();
+            return 0.0; // Handle the error case appropriately.
+        }
+    }
 
-            // Récupérez la distance estimée du trajet en kilomètres.
+    private String getJustification(double durationInMinutes, String startPoint, String destination, String carType, double totalCost) {
+        // Récupérez la distance estimée du trajet en kilomètres.
+        GeoApiContext geoApiContext = new GeoApiContext.Builder()
+                .apiKey("AIzaSyAz2goHIOGij1pt2zSQufKc3rQssBRMwIw")
+                .build();
+
+        try {
+            DirectionsResult result = DirectionsApi.newRequest(geoApiContext)
+                    .origin(startPoint)
+                    .destination(destination)
+                    .mode(TravelMode.DRIVING)
+                    .await();
+
             double distanceInKm = result.routes[0].legs[0].distance.inMeters / 1000.0;
 
             // Calcul de la quantité estimée de carburant utilisée (hypothétique, à adapter à vos besoins).
             double fuelConsumptionRate = 0.12; // exemple : 0.12 litre par kilomètre
             double estimatedFuelUsage = distanceInKm * fuelConsumptionRate;
 
-            // Affichez les résultats avec une justification détaillée.
-            String justification = String.format("Durée estimée : %.2f minutes\n" +
+            // Calcul de la rémunération totale du chauffeur.
+            double driverPayment = (durationInMinutes / 60.0) * 30.0;
+
+            // Calcul du supplément catégorie.
+            double categorySurcharge = 0.0;
+            if (!carType.equals("Voiture classique")) {
+                if (carType.equals("Voiture Van")) {
+                    categorySurcharge = 7.0;
+                } else if (carType.equals("Voiture de luxe")) {
+                    categorySurcharge = 15.0;
+                }
+            }
+
+            // Construire la justification à afficher.
+            return String.format("Durée estimée : %.2f minutes\n" +
                             "Distance estimée : %.2f km\n" +
                             "Quantité estimée de carburant : %.2f litres\n" +
-                            "Coût du trajet : %.2f euros (incluant 30 euros de rémunération pour le chauffeur)",
-                    durationInMinutes, distanceInKm, estimatedFuelUsage, totalCost);
-
-            // Create an Intent to start the new activity.
-            Intent intent = new Intent(this, RideInfoActivity.class);
-
-            // Pass relevant information to the new activity.
-            intent.putExtra("justification", justification);
-
-            // Start the new activity.
-            startActivity(intent);
-
+                            "Rémunération totale du chauffeur : %.2f euros\n" +
+                            "Supplément catégorie : %.2f euros\n" +
+                            "Prix de la course : %.2f euros",
+                    durationInMinutes, distanceInKm, estimatedFuelUsage, driverPayment, categorySurcharge, totalCost);
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "Erreur lors du calcul du trajet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Erreur lors du calcul de la justification", Toast.LENGTH_SHORT).show();
+            return "Erreur de justification";
         }
-    }
-
-    private double calculateTotalCost(double durationInHours) {
-        // Rémunération du chauffeur (30 euros par heure).
-        double driverPaymentRate = 30.0;
-        double totalCost = durationInHours * driverPaymentRate;
-
-        // Vous pouvez également ajouter d'autres coûts tels que le coût du trajet lui-même.
-
-        return totalCost;
     }
 }

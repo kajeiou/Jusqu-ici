@@ -1,11 +1,11 @@
 package com.example.apigooglemap;
 
 import android.content.Intent;
-import android.graphics.drawable.AnimationDrawable;  // Importez cette ligne
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;  // Importez cette ligne
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +23,7 @@ public class RideInfoActivity extends AppCompatActivity {
         // Récupérez les données passées depuis MainActivity
         Intent intent = getIntent();
         String justification = intent.getStringExtra("justification");
+        String carType = intent.getStringExtra("carType");
 
         // Affichez les informations dans le TextView approprié
         TextView textViewJustification = findViewById(R.id.textViewJustification);
@@ -30,6 +31,25 @@ public class RideInfoActivity extends AppCompatActivity {
 
         // Référencez l'ImageView
         imageViewCar = findViewById(R.id.imageViewCar);
+
+        // Changez l'image en fonction de la catégorie
+        if (carType != null) {
+            switch (carType) {
+                case "Voiture classique":
+                    imageViewCar.setImageResource(R.drawable.car_frame_1);
+                    break;
+                case "Voiture Van":
+                    imageViewCar.setImageResource(R.drawable.car_frame_2);
+                    break;
+                case "Voiture de luxe":
+                    imageViewCar.setImageResource(R.drawable.car_frame_3);
+                    break;
+                default:
+                    // Utilisez une image par défaut si la catégorie n'est pas reconnue
+                    imageViewCar.setImageResource(R.drawable.car_frame_1);
+                    break;
+            }
+        }
 
         // Ajoutez des actions aux boutons Accepter et Refuser
         Button buttonAccept = findViewById(R.id.buttonAccept);
