@@ -3,26 +3,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/editTextStart"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutStart"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Point de départ"/>
+        android:layout_marginBottom="16dp"
+        android:hint="Point de départ">
 
-    <EditText
-        android:id="@+id/editTextDestination"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextStart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutDestination"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editTextStart"
-        android:hint="Point d'arrivée"/>
+        android:layout_below="@id/textInputLayoutStart"
+        android:hint="Point d'arrivée">
 
-    <Button
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextDestination"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonSubmit"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/editTextDestination"
+        android:layout_below="@id/textInputLayoutDestination"
+        android:layout_marginTop="16dp"
+        android:icon="@drawable/ic_submit"
         android:onClick="onSubmitClick"
         android:text="Soumettre"/>
+
 </RelativeLayout>

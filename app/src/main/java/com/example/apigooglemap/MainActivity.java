@@ -1,6 +1,7 @@
 package com.example.apigooglemap;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.apigooglemap.RideInfoActivity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -157,7 +159,14 @@ public class MainActivity extends AppCompatActivity {
                             "Coût du trajet : %.2f euros (incluant 30 euros de rémunération pour le chauffeur)",
                     durationInMinutes, distanceInKm, estimatedFuelUsage, totalCost);
 
-            Toast.makeText(this, justification, Toast.LENGTH_LONG).show();
+            // Create an Intent to start the new activity.
+            Intent intent = new Intent(this, RideInfoActivity.class);
+
+            // Pass relevant information to the new activity.
+            intent.putExtra("justification", justification);
+
+            // Start the new activity.
+            startActivity(intent);
 
         } catch (Exception e) {
             e.printStackTrace();
