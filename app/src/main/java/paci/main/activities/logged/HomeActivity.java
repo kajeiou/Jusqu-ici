@@ -312,15 +312,16 @@ public class HomeActivity extends AppCompatActivity {
                     categorySurcharge = 15.0;
                 }
             }
+            double totalCourseCost = driverPayment + categorySurcharge;
 
-            // Construire la justification à afficher.
+
             return String.format("Durée estimée : %.2f minutes\n" +
                             "Distance estimée : %.2f km\n" +
                             "Quantité estimée de carburant : %.2f litres\n" +
                             "Rémunération totale du chauffeur : %.2f euros\n" +
                             "Supplément catégorie : %.2f euros\n" +
                             "Prix de la course : %.2f euros",
-                    durationInMinutes, distanceInKm, estimatedFuelUsage, driverPayment, categorySurcharge, totalCost);
+                    durationInMinutes, distanceInKm, estimatedFuelUsage, driverPayment, categorySurcharge, totalCourseCost);
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Erreur lors du calcul de la justification", Toast.LENGTH_SHORT).show();
