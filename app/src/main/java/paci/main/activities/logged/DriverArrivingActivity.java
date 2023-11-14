@@ -10,11 +10,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+
 import android.widget.Toast;
 import paci.main.R;
 import pl.droidsonroids.gif.GifImageView;
@@ -32,7 +30,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
@@ -172,7 +169,6 @@ public class DriverArrivingActivity extends AppCompatActivity implements OnMapRe
                     googleMap.addMarker(new MarkerOptions().position(pointA).title("Départ"));
                     googleMap.addMarker(new MarkerOptions().position(pointB).title("Arrivée"));
 
-                    // Calcul de l'itinéraire en voiture
                     calculateDirections(googleMap, pointA, pointB);
                 } else {
                     Log.e(TAG, "Erreur lors de la conversion des adresses en coordonnées LatLng");
@@ -208,7 +204,6 @@ public class DriverArrivingActivity extends AppCompatActivity implements OnMapRe
                 DirectionsRoute route = result.routes[0];
                 DirectionsLeg leg = route.legs[0];
 
-                // Add polyline for the route
                 List<LatLng> points = decodePolyline(route.overviewPolyline.getEncodedPath());
                 PolylineOptions lineOptions = new PolylineOptions()
                         .addAll(points)
@@ -216,14 +211,12 @@ public class DriverArrivingActivity extends AppCompatActivity implements OnMapRe
                         .color(ContextCompat.getColor(this, R.color.colorAccent));
                 googleMap.addPolyline(lineOptions);
 
-                // Add a marker with a car icon near the starting point
                 LatLng carMarkerPosition = new LatLng(startPoint.latitude + 0.010, startPoint.longitude + 0.010);
                 MarkerOptions carMarkerOptions = new MarkerOptions()
                         .position(carMarkerPosition)
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_car));
                 googleMap.addMarker(carMarkerOptions);
 
-                // Adjust the camera to show the entire route
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
                 builder.include(startPoint);
                 builder.include(destination);

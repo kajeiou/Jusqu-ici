@@ -51,7 +51,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            // Nom d'utilisateur
             String username = user.getDisplayName();
             if (username != null && !username.isEmpty()) {
                 usernameTextView.setText(username);
@@ -122,7 +121,7 @@ public class ProfileActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PICK_IMAGE_REQUEST) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // La permission a été accordée, ouvrir la galerie
+
                 openGallery();
             } else {
                 Toast.makeText(this, "Permission refusée, impossible de sélectionner une image", Toast.LENGTH_SHORT).show();

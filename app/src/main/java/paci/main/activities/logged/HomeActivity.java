@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,7 +26,6 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.maps.GeoApiContext;
-import com.google.maps.errors.ApiException;
 import com.google.maps.DirectionsApi;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.TravelMode;
@@ -144,18 +142,18 @@ public class HomeActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Nouvelle adresse : " + address, Toast.LENGTH_SHORT).show();
 
                         locationManager.removeUpdates(this);
-                        progressBar.setVisibility(View.INVISIBLE); // Cacher le ProgressBar
+                        progressBar.setVisibility(View.INVISIBLE);
                     }
                 });
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         LOCATION_PERMISSION_REQUEST_CODE);
-                progressBar.setVisibility(View.INVISIBLE); // Cacher le ProgressBar en cas de demande de permission
+                progressBar.setVisibility(View.INVISIBLE);
             }
         } else {
             Toast.makeText(this, "Le gestionnaire de localisation n'est pas disponible", Toast.LENGTH_SHORT).show();
-            progressBar.setVisibility(View.INVISIBLE); // Cacher le ProgressBar en cas d'erreur
+            progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -232,27 +230,20 @@ public class HomeActivity extends AppCompatActivity {
                 // Mettez à jour le coût total en fonction du type de voiture sélectionné.
                 double totalCost = calculateTotalCost(durationInMinutes, selectedCarType);
 
-                // Créez une Intent pour démarrer la nouvelle activité.
                 Intent intent = new Intent(HomeActivity.this, RideInfoActivity.class);
 
-                // Passez les informations pertinentes à la nouvelle activité.
                 intent.putExtra("justification", getJustification(durationInMinutes, startPoint, destination, selectedCarType, totalCost));
                 intent.putExtra("totalCost", totalCost);
-                intent.putExtra("carType", selectedCarType); // Ajout de la catégorie de voiture sélectionnée
+                intent.putExtra("carType", selectedCarType);
+                intent.putExtra("startPoint", startPoint);
+                intent.putExtra("destination", destination);
 
-                // Démarrez la nouvelle activité.
                 startActivity(intent);
             }
         });
 
         builder.show();
     }
-
-
-
-     //intent.putExtra("startPoint", startPoint);
-    //intent.putExtra("destination", destination)
-    //R.string.google_client_id)
 
     private GeoApiContext createGeoApiContext() {
         return new GeoApiContext.Builder()
@@ -278,7 +269,7 @@ public class HomeActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Erreur lors du calcul de la durée du trajet", Toast.LENGTH_SHORT).show();
-            return 0.0; // Handle the error case appropriately.
+            return 0.0;
         }
     }
 
