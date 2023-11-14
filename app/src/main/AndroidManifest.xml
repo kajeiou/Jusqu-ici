@@ -34,6 +34,11 @@
             android:label="Réserver une course">
         </activity>
 
+        <activity
+            android:name="paci.main.activities.logged.ProfileActivity"
+            android:label="Mon profil">
+        </activity>
+
     </application>
 
 </manifest>

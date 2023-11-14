@@ -1,6 +1,7 @@
 package paci.main;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
@@ -28,6 +29,15 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import paci.main.activities.logged.HomeActivity;
 
@@ -42,6 +52,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private GoogleApiClient mGoogleApiClient;
     private static final int RC_SIGN_IN = 9001;
     private FirebaseAuth mAuth;
+    private DatabaseReference databaseRef;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +111,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
             .build();
 
-        mAuth = FirebaseAuth.getInstance();
+        try {
+            mAuth = FirebaseAuth.getInstance();
+            databaseRef = FirebaseDatabase.getInstance().getReference();
+        } catch (Exception e) {
+            Log.e(TAG, "Error initializing Firebase: " + e.getMessage(), e);
+            Toast.makeText(LoginActivity.this, "Firebase " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
 
         SignInButton signInButton = findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
@@ -130,6 +149,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         if (task.isSuccessful()) {
                             // Authentification réussie
                             FirebaseUser user = mAuth.getCurrentUser();
+
+                            // Ajouter l'ID de l'utilisateur et la date de dernière connexion dans la base de données
+                            addToFirebaseDatabase(user.getUid());
+
                             navigateToHome(user.getEmail());
                         } else {
                             Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
@@ -141,6 +164,48 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             Toast.makeText(LoginActivity.this, "Veuillez renseigner tous les champs du formulaire.", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void addToFirebaseDatabase(String userId) {
+        ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+        progressDialog.setMessage("Mise à jour du profil ...");
+        progressDialog.show();
+        Toast.makeText(LoginActivity.this, "addToFirebaseDatabase", Toast.LENGTH_SHORT).show();
+
+        try {
+            DatabaseReference userRef = databaseRef.child("users").child(userId);
+
+            // Ajoute l'ID de l'utilisateur à la collection "users"
+            userRef.child("userId").setValue(userId, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
+                    if (databaseError == null) {
+                        Toast.makeText(LoginActivity.this, "Ajouté avec succès dans le child", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Erreur lors de l'ajout : " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+
+                    progressDialog.dismiss();
+                }
+            });
+        } catch (Exception e) {
+            // Gestion de l'erreur
+            Toast.makeText(LoginActivity.this, "Une erreur s'est produite : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Erreur lors de l'ajout de l'ID dans la base de données", e);
+            progressDialog.dismiss();
+        }
+
+        Toast.makeText(LoginActivity.this, "fin de la fonction", Toast.LENGTH_SHORT).show();
+    }
+
+
+    private String getCurrentDateTime() {
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        return dateFormat.format(currentDate);
+    }
+
 
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
@@ -173,16 +238,21 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
-            .addOnCompleteListener(this, task -> {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "signInWithCredential:success");
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    navigateToHome(user.getUid());
-                } else {
-                    Log.w(TAG, "signInWithCredential:failure", task.getException());
-                    Toast.makeText(this, "Authentication échoué.", Toast.LENGTH_SHORT).show();
-                }
-            });
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "signInWithCredential:success");
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        navigateToHome(user.getUid());
+                    } else {
+                        Log.w(TAG, "signInWithCredential:failure", task.getException());
+                        Toast.makeText(this, "Authentication échoué.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(this, e -> {
+                    Log.e(TAG, "Firebase authentication failed", e);
+                    Toast.makeText(this, "Firebase authentication failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+
     }
 
     @Override

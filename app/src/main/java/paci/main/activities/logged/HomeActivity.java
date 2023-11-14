@@ -15,6 +15,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.maps.GeoApiContext;
@@ -49,52 +53,66 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        Intent intent = getIntent();
-        if (intent != null) {
-            String userId = intent.getStringExtra("userId");
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-            if (userId != null) {
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            Toast.makeText(HomeActivity.this, "User trouvé" + user.getEmail(), Toast.LENGTH_SHORT).show();
+            String username = user.getDisplayName();
 
-                if (user != null) {
-                    Toast.makeText(HomeActivity.this, "User trouvé", Toast.LENGTH_SHORT).show();
-                    String username = user.getDisplayName();
-                    if (username != null && !username.isEmpty()) {
-                        utilisateurTextView = findViewById(R.id.username);
-                        utilisateurTextView.setText("Bienvenue " + username);
-                    }
-                    editTextStart = findViewById(R.id.editTextStart);
-                    Button buttonMyLocation = findViewById(R.id.buttonMyLocation);
-                    buttonMyLocation.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            checkLocationPermission();
-                        }
-                    });
-
-
-                    editTextDestination = findViewById(R.id.editTextDestination);
-
-
-                    Button submitButton = findViewById(R.id.buttonSubmit);
-                    submitButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            onSubmitClick(v);
-                        }
-                    });
-
-                } else {
-                    Toast.makeText(HomeActivity.this, "User non trouvé", Toast.LENGTH_SHORT).show();
-                    displayErrorAndNavigateToMain();
-                }
+            utilisateurTextView = findViewById(R.id.username);
+            if (username != null && !username.isEmpty()) {
+                Toast.makeText(HomeActivity.this, "UserName trouvé" + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                utilisateurTextView.setText("Bienvenue " + username);
             } else {
-                displayErrorAndNavigateToMain();
+                utilisateurTextView.setText("Bienvenue " + user.getEmail());
             }
+
+            BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.menu_item1:
+                            // Fragment ou activité pour le menu_item1
+                            return true;
+                        case R.id.menu_item2:
+                            // Fragment ou activité pour le menu_item2
+                            Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                            startActivity(intent);
+                            return true;
+                        // Ajoutez des cas pour les autres éléments du menu
+                        default:
+                            return false;
+                    }
+                }
+            });
+
+            editTextStart = findViewById(R.id.editTextStart);
+            Button buttonMyLocation = findViewById(R.id.buttonMyLocation);
+            buttonMyLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    checkLocationPermission();
+                }
+            });
+
+            editTextDestination = findViewById(R.id.editTextDestination);
+
+            Button submitButton = findViewById(R.id.buttonSubmit);
+            submitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onSubmitClick(v);
+                }
+            });
+
+        } else {
+            Toast.makeText(HomeActivity.this, "User non trouvé", Toast.LENGTH_SHORT).show();
+            displayErrorAndNavigateToMain();
         }
-
-
     }
+
+
 
     private void checkLocationPermission() {
         Toast.makeText(this, "Bouton cliqué", Toast.LENGTH_SHORT).show();
@@ -228,20 +246,17 @@ public class HomeActivity extends AppCompatActivity {
             double fuelConsumptionRate = 0.12; // exemple : 0.12 litre par kilomètre
             double estimatedFuelUsage = distanceInKm * fuelConsumptionRate;
 
-            // Affichez les résultats avec une justification détaillée.
-            // Supposons que vous avez des TextView correspondant à chaque donnée dans votre mise en page XML avec des IDs appropriés.
             TextView durationTextView = findViewById(R.id.durationTextView);
             TextView distanceTextView = findViewById(R.id.distanceTextView);
             TextView fuelUsageTextView = findViewById(R.id.fuelUsageTextView);
             TextView costTextView = findViewById(R.id.costTextView);
 
-            // Utilisez les valeurs calculées pour mettre à jour les TextView correspondants.
-                        String durationText = String.format("Durée estimée : %.2f minutes", durationInMinutes);
+            String durationText = String.format("Durée estimée : %.2f minutes", durationInMinutes);
                         String distanceText = String.format("Distance estimée : %.2f km", distanceInKm);
                         String fuelUsageText = String.format("Quantité estimée de carburant : %.2f litres", estimatedFuelUsage);
                         String costText = String.format("Coût du trajet : %.2f euros (incluant 30 euros de rémunération pour le chauffeur)", totalCost);
 
-            // Mettez à jour les TextView avec les valeurs calculées.
+
                         durationTextView.setText(durationText);
                         distanceTextView.setText(distanceText);
                         fuelUsageTextView.setText(fuelUsageText);
@@ -263,4 +278,6 @@ public class HomeActivity extends AppCompatActivity {
 
         return totalCost;
     }
+
+
 }
