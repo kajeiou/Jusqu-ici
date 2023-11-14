@@ -2,18 +2,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal|center_vertical"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
     android:orientation="vertical"
     android:background="@android:color/background_light">
+
+    <ImageView
+        android:id="@+id/logoImageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/driving" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:gravity="center"
-        android:text="Bienvenue sur Jusqu'ici"
-        android:textSize="22sp"
+        android:text="Bienvenue sur Driving"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="@android:color/black" />
 
@@ -21,18 +27,17 @@
         android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:padding="15dp"
         android:text="RÉSERVER UNE COURSE"
-        android:backgroundTint="@color/purple_500"
-        android:layout_marginBottom="10dp" />
+        android:backgroundTint="@color/purple_500" />
 
     <com.google.android.material.button.MaterialButton
-        android:backgroundTint="@color/colorAccent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:padding="15dp"
-        android:text="Nous rejoindre en tant que chauffeur" />
-
+        android:text="NOUS REJOINDRE EN TANT QUE CHAUFFEUR"
+        android:backgroundTint="@color/colorAccent" />
 
 </LinearLayout>
