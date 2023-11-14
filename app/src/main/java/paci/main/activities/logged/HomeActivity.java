@@ -258,16 +258,24 @@ public class HomeActivity extends AppCompatActivity {
                 // Mettez à jour le coût total en fonction du type de voiture sélectionné.
                 double totalCost = calculateTotalCost(durationInMinutes, selectedCarType);
 
-                // Créez une Intent pour démarrer la nouvelle activité.
-                Intent intent = new Intent(HomeActivity.this, RideInfoActivity.class);
+
 
                 // Passez les informations pertinentes à la nouvelle activité.
-                intent.putExtra("justification", getJustification(durationInMinutes, startPoint, destination, selectedCarType, totalCost));
-                intent.putExtra("totalCost", totalCost);
-                intent.putExtra("carType", selectedCarType); // Ajout de la catégorie de voiture sélectionnée
+                String justifs = getJustification(durationInMinutes, startPoint, destination, selectedCarType, totalCost);
 
-                // Démarrez la nouvelle activité.
-                startActivity(intent);
+
+                if(justifs !="Erreur de justification") {
+                    // Créez une Intent pour démarrer la nouvelle activité.
+                    Intent intent = new Intent(HomeActivity.this, RideInfoActivity.class);
+                    intent.putExtra("justification", justifs);
+                    intent.putExtra("totalCost", totalCost);
+                    intent.putExtra("carType", selectedCarType); // Ajout de la catégorie de voiture sélectionnée
+
+                    // Démarrez la nouvelle activité.
+                    startActivity(intent);
+                }
+
+
             }
         });
 

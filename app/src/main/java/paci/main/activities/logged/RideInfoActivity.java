@@ -24,6 +24,8 @@ public class RideInfoActivity extends AppCompatActivity {
         // Récupérez les données passées depuis MainActivity
         Intent intent = getIntent();
         String justification = intent.getStringExtra("justification");
+        Toast.makeText(this, justification, Toast.LENGTH_SHORT).show();
+
         String carType = intent.getStringExtra("carType");
 
         // Affichez les informations dans le TextView approprié
