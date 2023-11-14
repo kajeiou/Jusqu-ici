@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:padding="15dp"
         android:text="RÉSERVER UNE COURSE"
-        style="@style/AppButtonStylePrimary"
+        android:backgroundTint="@color/purple_500"
         android:layout_marginBottom="10dp" />
 
     <com.google.android.material.button.MaterialButton

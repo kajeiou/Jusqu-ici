@@ -12,33 +12,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ClassroomCommunity">
-
         <activity
-            android:name="paci.main.MainActivity"
+            android:name=".activities.logged.RideInfoActivity"
+            android:exported="false"
+            android:label="@string/title_activity_ride_info"
+            android:theme="@style/Theme.ClassroomCommunity" />
+        <activity
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
         <activity
-            android:name="paci.main.LoginActivity"
-            android:label="Login">
-        </activity>
-
+            android:name=".LoginActivity"
+            android:label="Login"></activity>
         <activity
-            android:name="paci.main.activities.logged.HomeActivity"
-            android:label="Réserver une course">
-        </activity>
-
+            android:name=".activities.logged.HomeActivity"
+            android:label="Réserver une course"></activity>
         <activity
-            android:name="paci.main.activities.logged.ProfileActivity"
-            android:label="Mon profil">
-        </activity>
-
+            android:name=".activities.logged.ProfileActivity"
+            android:label="Mon profil"></activity>
     </application>
 
 </manifest>

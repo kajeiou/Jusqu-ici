@@ -11,4 +11,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorSecondary">#009688</color>
+    <color name="colorAccept">#4CAF50</color>
+    <color name="colorDecline">#C0C0C0</color>
 </resources>
