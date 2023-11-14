@@ -24,7 +24,6 @@ public class RideInfoActivity extends AppCompatActivity {
         // Récupérez les données passées depuis MainActivity
         Intent intent = getIntent();
         String justification = intent.getStringExtra("justification");
-        Toast.makeText(this, justification, Toast.LENGTH_SHORT).show();
 
         String carType = intent.getStringExtra("carType");
 
@@ -91,9 +90,21 @@ public class RideInfoActivity extends AppCompatActivity {
     }
 
     private void openDriverArrivingActivity() {
-        Intent intent = new Intent(this, DriverArrivingActivity.class);
-        startActivity(intent);
+        Intent intent = getIntent();
+        if (intent != null) {
+            String startPoint = intent.getStringExtra("startPoint");
+            String destination = intent.getStringExtra("destination");
+
+            if (startPoint != null && destination != null) {
+                Intent newIntent = new Intent(this, DriverArrivingActivity.class);
+                newIntent.putExtra("startPoint", startPoint);
+                newIntent.putExtra("destination", destination);
+
+                startActivity(newIntent);
+            }
+        }
     }
+
 
     private void navigateToHome() {
         // Retournez à l'activité d'accueil (MainActivity)

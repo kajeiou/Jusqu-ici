@@ -1,12 +1,6 @@
 package paci.main.activities.logged;
+
 import android.Manifest;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,8 +11,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -26,16 +18,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.maps.GeoApiContext;
-import com.google.maps.model.DirectionsResult;
+import com.google.maps.errors.ApiException;
 import com.google.maps.DirectionsApi;
-import com.google.maps.GeoApiContext;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.TravelMode;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.IOException;
 import java.util.List;
@@ -50,6 +46,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView utilisateurTextView;
     private EditText editTextStart, editTextDestination;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,31 +55,17 @@ public class HomeActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user != null) {
-            Toast.makeText(HomeActivity.this, "User trouvé" + user.getEmail(), Toast.LENGTH_SHORT).show();
-            String username = user.getDisplayName();
-
-            utilisateurTextView = findViewById(R.id.username);
-            if (username != null && !username.isEmpty()) {
-                Toast.makeText(HomeActivity.this, "UserName trouvé" + user.getDisplayName(), Toast.LENGTH_SHORT).show();
-                utilisateurTextView.setText("Bienvenue " + username);
-            } else {
-                utilisateurTextView.setText("Bienvenue " + user.getEmail());
-            }
-
             BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
             bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.menu_item1:
-                            // Fragment ou activité pour le menu_item1
                             return true;
                         case R.id.menu_item2:
-                            // Fragment ou activité pour le menu_item2
                             Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
                             startActivity(intent);
                             return true;
-                        // Ajoutez des cas pour les autres éléments du menu
                         default:
                             return false;
                     }
@@ -109,31 +92,25 @@ public class HomeActivity extends AppCompatActivity {
             });
 
         } else {
-            Toast.makeText(HomeActivity.this, "User non trouvé", Toast.LENGTH_SHORT).show();
             displayErrorAndNavigateToMain();
         }
     }
 
-
-
     private void checkLocationPermission() {
-        Toast.makeText(this, "Bouton cliqué", Toast.LENGTH_SHORT).show();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Demande de permission de localisation", Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         } else {
-            Toast.makeText(this, "Permission de localisation déjà accordée", Toast.LENGTH_SHORT).show();
             getUserLocation();
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission de localisation accordée", Toast.LENGTH_SHORT).show();
                 getUserLocation();
             } else {
                 Toast.makeText(this, "Permission de localisation refusée", Toast.LENGTH_SHORT).show();
@@ -144,7 +121,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void getUserLocation() {
-
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         if (locationManager != null) {
@@ -153,7 +129,6 @@ public class HomeActivity extends AppCompatActivity {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, new LocationListener() {
                     @Override
                     public void onLocationChanged(Location location) {
-                        // Une fois que la localisation change, utilisez la nouvelle localisation
                         double latitude = location.getLatitude();
                         double longitude = location.getLongitude();
                         String userLocation = latitude + ", " + longitude;
@@ -167,7 +142,6 @@ public class HomeActivity extends AppCompatActivity {
 
                         locationManager.removeUpdates(this);
                     }
-
                 });
             } else {
                 ActivityCompat.requestPermissions(this,
@@ -178,8 +152,6 @@ public class HomeActivity extends AppCompatActivity {
             Toast.makeText(this, "Le gestionnaire de localisation n'est pas disponible", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     private String getAddressFromCoordinates(String coordinates) {
         String[] latLng = coordinates.split(", ");
@@ -207,7 +179,6 @@ public class HomeActivity extends AppCompatActivity {
         return "Adresse introuvable";
     }
 
-
     private void displayErrorAndNavigateToMain() {
         Toast.makeText(HomeActivity.this, "Une erreur est survenue.", Toast.LENGTH_SHORT).show();
         Intent intentDisconnect = new Intent(HomeActivity.this, LoginActivity.class);
@@ -218,76 +189,87 @@ public class HomeActivity extends AppCompatActivity {
         String startPoint = editTextStart.getText().toString().trim();
         String destination = editTextDestination.getText().toString().trim();
 
-        // Vérifiez si startPoint et destination sont non null et non vides
         if (!startPoint.isEmpty() && !destination.isEmpty()) {
-            // Utilisez une boîte de dialogue pour permettre à l'utilisateur de choisir le type de voiture.
             showCarTypeDialog(startPoint, destination);
         } else {
-            // Affichez un dialogue d'alerte si l'un des champs est vide
             showAlertDialog("Veuillez remplir le point de départ et d'arrivée.");
         }
     }
+
     private void showAlertDialog(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
                 .setTitle("Attention")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // Fermez le dialogue ou faites quelque chose en conséquence
                         dialog.dismiss();
                     }
                 });
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
     private void showCarTypeDialog(final String startPoint, final String destination) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Sélectionnez le type de voiture");
 
-        // Options de voiture
         final CharSequence[] carTypes = {"Voiture classique", "Voiture Van", "Voiture de luxe"};
 
         builder.setItems(carTypes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String selectedCarType = carTypes[which].toString();
-
-                // Récupérez la durée estimée du trajet en minutes.
-                double durationInMinutes = getDurationInMinutes(startPoint, destination);
-
-                // Mettez à jour le coût total en fonction du type de voiture sélectionné.
-                double totalCost = calculateTotalCost(durationInMinutes, selectedCarType);
-
-
-
-                // Passez les informations pertinentes à la nouvelle activité.
-                String justifs = getJustification(durationInMinutes, startPoint, destination, selectedCarType, totalCost);
-
-
-                if(justifs !="Erreur de justification") {
-                    // Créez une Intent pour démarrer la nouvelle activité.
-                    Intent intent = new Intent(HomeActivity.this, RideInfoActivity.class);
-                    intent.putExtra("justification", justifs);
-                    intent.putExtra("totalCost", totalCost);
-                    intent.putExtra("carType", selectedCarType); // Ajout de la catégorie de voiture sélectionnée
-
-                    // Démarrez la nouvelle activité.
-                    startActivity(intent);
-                }
-
-
+                getJustificationAndDuration(startPoint, destination, selectedCarType);
             }
         });
 
         builder.show();
     }
-    private String getJustification(double durationInMinutes, String startPoint, String destination, String carType, double totalCost) {
-        // Récupérez la distance estimée du trajet en kilomètres.
-        GeoApiContext geoApiContext = new GeoApiContext.Builder()
-                .apiKey("AIzaSyAz2goHIOGij1pt2zSQufKc3rQssBRMwIw")
-                .build();
 
+    private void getJustificationAndDuration(String startPoint, String destination, String carType) {
+        double durationInMinutes = getDurationInMinutes(startPoint, destination);
+        double totalCost = calculateTotalCost(durationInMinutes, carType);
+
+        String justification = getJustification(durationInMinutes, startPoint, destination, carType);
+
+        if (!justification.equals("Erreur de justification")) {
+            Intent intent = new Intent(HomeActivity.this, RideInfoActivity.class);
+            intent.putExtra("justification", justification);
+            intent.putExtra("totalCost", totalCost);
+            intent.putExtra("carType", carType);
+            intent.putExtra("startPoint", startPoint);
+            intent.putExtra("destination", destination);
+            startActivity(intent);
+        }
+    }
+
+    private double calculateTotalCost(double durationInMinutes, String carType) {
+        double driverPaymentRatePerMinute = 0.5;
+        double additionalCost = 0.0;
+
+        if (carType.equals("Voiture Van")) {
+            additionalCost = 7.0;
+        } else if (carType.equals("Voiture de luxe")) {
+            additionalCost = 15.0;
+        }
+
+        additionalCost += (durationInMinutes / 60.0) * 30.0;
+
+        double totalCost = durationInMinutes * driverPaymentRatePerMinute + additionalCost;
+
+        return totalCost;
+    }
+
+    private GeoApiContext createGeoApiContext() {
+        return new GeoApiContext.Builder()
+                .apiKey(getString(R.string.google_client_id))
+                .build();
+    }
+
+    private String getJustification(double durationInMinutes, String startPoint, String destination, String carType) {
         try {
+            GeoApiContext geoApiContext = createGeoApiContext();
+
             DirectionsResult result = DirectionsApi.newRequest(geoApiContext)
                     .origin(startPoint)
                     .destination(destination)
@@ -295,15 +277,10 @@ public class HomeActivity extends AppCompatActivity {
                     .await();
 
             double distanceInKm = result.routes[0].legs[0].distance.inMeters / 1000.0;
-
-            // Calcul de la quantité estimée de carburant utilisée (hypothétique, à adapter à vos besoins).
-            double fuelConsumptionRate = 0.12; // exemple : 0.12 litre par kilomètre
+            double fuelConsumptionRate = 0.12;
             double estimatedFuelUsage = distanceInKm * fuelConsumptionRate;
-
-            // Calcul de la rémunération totale du chauffeur.
             double driverPayment = (durationInMinutes / 60.0) * 30.0;
 
-            // Calcul du supplément catégorie.
             double categorySurcharge = 0.0;
             if (!carType.equals("Voiture classique")) {
                 if (carType.equals("Voiture Van")) {
@@ -314,7 +291,6 @@ public class HomeActivity extends AppCompatActivity {
             }
             double totalCourseCost = driverPayment + categorySurcharge;
 
-
             return String.format("Durée estimée : %.2f minutes\n" +
                             "Distance estimée : %.2f km\n" +
                             "Quantité estimée de carburant : %.2f litres\n" +
@@ -322,58 +298,32 @@ public class HomeActivity extends AppCompatActivity {
                             "Supplément catégorie : %.2f euros\n" +
                             "Prix de la course : %.2f euros",
                     durationInMinutes, distanceInKm, estimatedFuelUsage, driverPayment, categorySurcharge, totalCourseCost);
+        } catch (ApiException | InterruptedException | IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Erreur lors du calcul de la durée du trajet" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return "Erreur de justification";
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "Erreur lors du calcul de la justification", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Erreur lors du calcul de la durée du trajet" + e.getMessage(), Toast.LENGTH_SHORT).show();
             return "Erreur de justification";
         }
     }
-    private double getDurationInMinutes(String startPoint, String destination) {
-        GeoApiContext geoApiContext = new GeoApiContext.Builder()
-                .apiKey("AIzaSyAz2goHIOGij1pt2zSQufKc3rQssBRMwIw")
-                .build();
 
+    private double getDurationInMinutes(String startPoint, String destination) {
         try {
+            GeoApiContext geoApiContext = createGeoApiContext();
             DirectionsResult result = DirectionsApi.newRequest(geoApiContext)
                     .origin(startPoint)
                     .destination(destination)
                     .mode(TravelMode.DRIVING)
                     .await();
 
-            // Récupérez la durée estimée du trajet en secondes.
             long durationInSeconds = result.routes[0].legs[0].duration.inSeconds;
-
-            // Convertissez la durée en minutes.
             return durationInSeconds / 60.0;
-
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "Erreur lors du calcul de la durée du trajet", Toast.LENGTH_SHORT).show();
-            return 0.0; // Handle the error case appropriately.
+            Toast.makeText(this, "Erreur lors du calcul de la durée du trajet" +e.getMessage(), Toast.LENGTH_SHORT).show();
+            return 0.0;
         }
     }
-
-    private double calculateTotalCost(double durationInMinutes, String carType) {
-        // Coût par minute pour une voiture classique.
-        double driverPaymentRatePerMinute = 0.5;
-
-        // Coûts supplémentaires pour les autres types de voitures.
-        double additionalCost = 0.0;
-
-        if (carType.equals("Voiture Van")) {
-            additionalCost = 7.0;
-        } else if (carType.equals("Voiture de luxe")) {
-            additionalCost = 15.0;
-        }
-
-        // Ajoutez la rémunération du chauffeur, 30€ par heure.
-        additionalCost += (durationInMinutes / 60.0) * 30.0;
-
-        // Calcul du coût total avec les coûts supplémentaires.
-        double totalCost = durationInMinutes * driverPaymentRatePerMinute + additionalCost;
-
-        return totalCost;
-    }
-
-
 }

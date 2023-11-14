@@ -4,6 +4,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
 
     <application
         android:allowBackup="true"
@@ -12,11 +17,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ClassroomCommunity">
-        <activity
-            android:name=".activities.logged.RideInfoActivity"
-            android:exported="false"
-            android:label="@string/title_activity_ride_info"
-            android:theme="@style/Theme.ClassroomCommunity" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_client_id" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -27,6 +32,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activities.logged.RideInfoActivity"
+            android:exported="false"
+            android:label="@string/title_activity_ride_info"
+            android:theme="@style/Theme.ClassroomCommunity" />
+        <activity
             android:name=".LoginActivity"
             android:label="Login"></activity>
         <activity
@@ -35,6 +45,9 @@
         <activity
             android:name=".activities.logged.ProfileActivity"
             android:label="Mon profil"></activity>
+        <activity
+            android:name=".activities.logged.DriverArrivingActivity"
+            android:label=""></activity>
     </application>
 
 </manifest>
