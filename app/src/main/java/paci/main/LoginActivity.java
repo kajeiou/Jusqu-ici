@@ -147,12 +147,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             mAuth.signInWithEmailAndPassword(username, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
-                            // Authentification réussie
                             FirebaseUser user = mAuth.getCurrentUser();
-
-                            // Ajouter l'ID de l'utilisateur et la date de dernière connexion dans la base de données
                             addToFirebaseDatabase(user.getUid());
-
                             navigateToHome(user.getEmail());
                         } else {
                             Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
@@ -160,7 +156,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         progressDialog.dismiss();
                     });
         } else {
-            progressDialog.dismiss(); // Fermez la boîte de dialogue si les champs ne sont pas remplis
+            progressDialog.dismiss();
             Toast.makeText(LoginActivity.this, "Veuillez renseigner tous les champs du formulaire.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -169,12 +165,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
         progressDialog.setMessage("Mise à jour du profil ...");
         progressDialog.show();
-        Toast.makeText(LoginActivity.this, "addToFirebaseDatabase", Toast.LENGTH_SHORT).show();
 
         try {
             DatabaseReference userRef = databaseRef.child("users").child(userId);
 
-            // Ajoute l'ID de l'utilisateur à la collection "users"
             userRef.child("userId").setValue(userId, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(@Nullable DatabaseError databaseError, @NonNull DatabaseReference databaseReference) {
@@ -194,8 +188,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             Log.e(TAG, "Erreur lors de l'ajout de l'ID dans la base de données", e);
             progressDialog.dismiss();
         }
-
-        Toast.makeText(LoginActivity.this, "fin de la fonction", Toast.LENGTH_SHORT).show();
     }
 
 
@@ -205,8 +197,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         return dateFormat.format(currentDate);
     }
-
-
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -257,7 +247,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        // Gestion des erreurs de connexion GoogleApiClient
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
     }

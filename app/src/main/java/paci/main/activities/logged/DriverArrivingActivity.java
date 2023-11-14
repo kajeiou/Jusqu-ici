@@ -10,15 +10,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import paci.main.R;
+import pl.droidsonroids.gif.GifImageView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,8 +35,15 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.DirectionsApi;
+import com.google.maps.DirectionsApiRequest;
+import com.google.maps.GeoApiContext;
+import com.google.maps.model.DirectionsLeg;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.DirectionsRoute;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -62,6 +74,10 @@ public class DriverArrivingActivity extends AppCompatActivity implements OnMapRe
         } else {
             redirectToHomeActivity();
         }
+        GifImageView imageViewCar = findViewById(R.id.imageViewCar);
+        Glide.with(this).load(R.drawable.car_gif).into(imageViewCar);
+
+
 
         try {
             showDriverArrivalNotification();
@@ -89,7 +105,7 @@ public class DriverArrivingActivity extends AppCompatActivity implements OnMapRe
     private void redirectToHomeActivity() {
         Intent homeIntent = new Intent(this, HomeActivity.class);
         startActivity(homeIntent);
-        finish(); // Facultatif, cela dépend de votre logique d'application
+        finish();
     }
 
     private void showDriverArrivalNotification() {
@@ -102,7 +118,7 @@ public class DriverArrivingActivity extends AppCompatActivity implements OnMapRe
 
             String randomDriver = driverNames[randomDriverIndex];
 
-            int randomDelayMinutes = random.nextInt(31);
+            int randomDelayMinutes = random.nextInt(16);
 
             String notificationText = String.format("%s arrive dans %d minutes", randomDriver, randomDelayMinutes);
 
@@ -148,7 +164,6 @@ public class DriverArrivingActivity extends AppCompatActivity implements OnMapRe
     @Override
     public void onMapReady(GoogleMap googleMap) {
         try {
-
             if (startPoint != null && destination != null) {
                 LatLng pointA = getLocationFromAddress(startPoint);
                 LatLng pointB = getLocationFromAddress(destination);
@@ -157,43 +172,109 @@ public class DriverArrivingActivity extends AppCompatActivity implements OnMapRe
                     googleMap.addMarker(new MarkerOptions().position(pointA).title("Départ"));
                     googleMap.addMarker(new MarkerOptions().position(pointB).title("Arrivée"));
 
-                    int polylineColor = ContextCompat.getColor(this, R.color.colorAccent);
-
-                    googleMap.addPolyline(new PolylineOptions()
-                            .add(pointA, pointB)
-                            .width(5)
-                            .color(polylineColor));
-
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    builder.include(pointA);
-                    builder.include(pointB);
-                    LatLngBounds bounds = builder.build();
-
-                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 100);
-                    googleMap.moveCamera(cameraUpdate);
-
-                    LatLng carMarkerPosition = new LatLng(pointA.latitude + 0.010, pointA.longitude + 0.010);
-
-                    MarkerOptions carMarkerOptions = new MarkerOptions()
-                            .position(carMarkerPosition)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_car));
-
-                    Marker carMarker = googleMap.addMarker(carMarkerOptions);
+                    // Calcul de l'itinéraire en voiture
+                    calculateDirections(googleMap, pointA, pointB);
                 } else {
                     Log.e(TAG, "Erreur lors de la conversion des adresses en coordonnées LatLng");
                 }
-
             } else {
                 Log.e(TAG, "startPoint ou destination est null");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "Erreur lors de l'affichage de la carte Google Maps", e);
         }
     }
 
-    // Méthode pour convertir une adresse en coordonnées LatLng
+    private GeoApiContext createGeoApiContext() {
+        return new GeoApiContext.Builder()
+                .apiKey(getString(R.string.google_client_id))
+                .build();
+    }
+
+    private void calculateDirections(GoogleMap googleMap, LatLng startPoint, LatLng destination) {
+        GeoApiContext context = new GeoApiContext.Builder()
+                .apiKey(getString(R.string.google_client_id))
+                .build();
+
+        DirectionsApiRequest request = DirectionsApi.getDirections(context,
+                startPoint.latitude + "," + startPoint.longitude,
+                destination.latitude + "," + destination.longitude);
+
+        try {
+            DirectionsResult result = request.await();
+
+            if (result != null && result.routes != null && result.routes.length > 0) {
+                DirectionsRoute route = result.routes[0];
+                DirectionsLeg leg = route.legs[0];
+
+                // Add polyline for the route
+                List<LatLng> points = decodePolyline(route.overviewPolyline.getEncodedPath());
+                PolylineOptions lineOptions = new PolylineOptions()
+                        .addAll(points)
+                        .width(5)
+                        .color(ContextCompat.getColor(this, R.color.colorAccent));
+                googleMap.addPolyline(lineOptions);
+
+                // Add a marker with a car icon near the starting point
+                LatLng carMarkerPosition = new LatLng(startPoint.latitude + 0.010, startPoint.longitude + 0.010);
+                MarkerOptions carMarkerOptions = new MarkerOptions()
+                        .position(carMarkerPosition)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_car));
+                googleMap.addMarker(carMarkerOptions);
+
+                // Adjust the camera to show the entire route
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(startPoint);
+                builder.include(destination);
+                LatLngBounds bounds = builder.build();
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 100);
+                googleMap.moveCamera(cameraUpdate);
+
+            } else {
+                Log.e(TAG, "Aucun itinéraire trouvé");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Erreur de calcul de l'itineraire", e);
+        }
+
+
+    }
+
+
+    private List<LatLng> decodePolyline(String encodedPolyline) {
+        List<LatLng> poly = new ArrayList<>();
+        int index = 0, len = encodedPolyline.length();
+        int lat = 0, lng = 0;
+
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encodedPolyline.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+            do {
+                b = encodedPolyline.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng p = new LatLng(((double) lat / 1E5), ((double) lng / 1E5));
+            poly.add(p);
+        }
+
+        return poly;
+    }
+
+
     private LatLng getLocationFromAddress(String address) {
         Geocoder geocoder = new Geocoder(this);
         List<Address> addresses;
@@ -213,5 +294,4 @@ public class DriverArrivingActivity extends AppCompatActivity implements OnMapRe
 
         return location;
     }
-
 }

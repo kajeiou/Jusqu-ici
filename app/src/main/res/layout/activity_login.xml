@@ -14,7 +14,6 @@
         android:src="@drawable/mylogo" />
 
     <TextView
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
@@ -22,19 +21,20 @@
         android:gravity="center"
         android:text="Connexion"
         android:textStyle="bold"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/black"
         android:textSize="22sp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="Nom d'utilisateur"
         />
 
-    <!-- Utilisez TextInputLayout pour une étiquette animée -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp">
 
         <EditText
             android:id="@+id/utilisateur"
@@ -45,6 +45,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:text="Mot de passe"
         />
 
@@ -64,16 +65,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Rester connecté ?"
+        android:textColor="@color/black"
         />
 
-    <!-- Utilisez un bouton avec un style personnalisé -->
     <Button
         android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:padding="15dp"
         android:text="S'AUTHENTIFIER"
-        android:backgroundTint="@color/black"
+        style="@style/BlackTextWhiteBackgroundButton"
+
         />
 
     <com.google.android.gms.common.SignInButton

@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +44,6 @@ import paci.main.R;
 public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = "HomeActivity";
-    private TextView utilisateurTextView;
     private EditText editTextStart, editTextDestination;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
@@ -121,6 +121,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void getUserLocation() {
+        final ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
+
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         if (locationManager != null) {
@@ -141,15 +144,18 @@ public class HomeActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Nouvelle adresse : " + address, Toast.LENGTH_SHORT).show();
 
                         locationManager.removeUpdates(this);
+                        progressBar.setVisibility(View.INVISIBLE); // Cacher le ProgressBar
                     }
                 });
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         LOCATION_PERMISSION_REQUEST_CODE);
+                progressBar.setVisibility(View.INVISIBLE); // Cacher le ProgressBar en cas de demande de permission
             }
         } else {
             Toast.makeText(this, "Le gestionnaire de localisation n'est pas disponible", Toast.LENGTH_SHORT).show();
+            progressBar.setVisibility(View.INVISIBLE); // Cacher le ProgressBar en cas d'erreur
         }
     }
 
@@ -219,27 +225,60 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String selectedCarType = carTypes[which].toString();
-                getJustificationAndDuration(startPoint, destination, selectedCarType);
+
+                // Récupérez la durée estimée du trajet en minutes.
+                double durationInMinutes = getDurationInMinutes(startPoint, destination);
+
+                // Mettez à jour le coût total en fonction du type de voiture sélectionné.
+                double totalCost = calculateTotalCost(durationInMinutes, selectedCarType);
+
+                // Créez une Intent pour démarrer la nouvelle activité.
+                Intent intent = new Intent(HomeActivity.this, RideInfoActivity.class);
+
+                // Passez les informations pertinentes à la nouvelle activité.
+                intent.putExtra("justification", getJustification(durationInMinutes, startPoint, destination, selectedCarType, totalCost));
+                intent.putExtra("totalCost", totalCost);
+                intent.putExtra("carType", selectedCarType); // Ajout de la catégorie de voiture sélectionnée
+
+                // Démarrez la nouvelle activité.
+                startActivity(intent);
             }
         });
 
         builder.show();
     }
 
-    private void getJustificationAndDuration(String startPoint, String destination, String carType) {
-        double durationInMinutes = getDurationInMinutes(startPoint, destination);
-        double totalCost = calculateTotalCost(durationInMinutes, carType);
 
-        String justification = getJustification(durationInMinutes, startPoint, destination, carType);
 
-        if (!justification.equals("Erreur de justification")) {
-            Intent intent = new Intent(HomeActivity.this, RideInfoActivity.class);
-            intent.putExtra("justification", justification);
-            intent.putExtra("totalCost", totalCost);
-            intent.putExtra("carType", carType);
-            intent.putExtra("startPoint", startPoint);
-            intent.putExtra("destination", destination);
-            startActivity(intent);
+     //intent.putExtra("startPoint", startPoint);
+    //intent.putExtra("destination", destination)
+    //R.string.google_client_id)
+
+    private GeoApiContext createGeoApiContext() {
+        return new GeoApiContext.Builder()
+                .apiKey(getString(R.string.google_client_id))
+                .build();
+    }
+    private double getDurationInMinutes(String startPoint, String destination) {
+        GeoApiContext geoApiContext = createGeoApiContext();
+
+        try {
+            DirectionsResult result = DirectionsApi.newRequest(geoApiContext)
+                    .origin(startPoint)
+                    .destination(destination)
+                    .mode(TravelMode.DRIVING)
+                    .await();
+
+            // Récupérez la durée estimée du trajet en secondes.
+            long durationInSeconds = result.routes[0].legs[0].duration.inSeconds;
+
+            // Convertissez la durée en minutes.
+            return durationInSeconds / 60.0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Erreur lors du calcul de la durée du trajet", Toast.LENGTH_SHORT).show();
+            return 0.0; // Handle the error case appropriately.
         }
     }
 
@@ -255,21 +294,17 @@ public class HomeActivity extends AppCompatActivity {
 
         additionalCost += (durationInMinutes / 60.0) * 30.0;
 
-        double totalCost = durationInMinutes * driverPaymentRatePerMinute + additionalCost;
+        double driverPayment = durationInMinutes * driverPaymentRatePerMinute;
+        double totalCost = driverPayment + additionalCost;
 
         return totalCost;
     }
 
-    private GeoApiContext createGeoApiContext() {
-        return new GeoApiContext.Builder()
-                .apiKey(getString(R.string.google_client_id))
-                .build();
-    }
+    private String getJustification(double durationInMinutes, String startPoint, String destination, String carType, double totalCost) {
 
-    private String getJustification(double durationInMinutes, String startPoint, String destination, String carType) {
+        GeoApiContext geoApiContext = createGeoApiContext();
+
         try {
-            GeoApiContext geoApiContext = createGeoApiContext();
-
             DirectionsResult result = DirectionsApi.newRequest(geoApiContext)
                     .origin(startPoint)
                     .destination(destination)
@@ -277,10 +312,15 @@ public class HomeActivity extends AppCompatActivity {
                     .await();
 
             double distanceInKm = result.routes[0].legs[0].distance.inMeters / 1000.0;
-            double fuelConsumptionRate = 0.12;
+
+            // Calcul de la quantité estimée de carburant utilisée (hypothétique, à adapter à vos besoins).
+            double fuelConsumptionRate = 0.12; // exemple : 0.12 litre par kilomètre
             double estimatedFuelUsage = distanceInKm * fuelConsumptionRate;
+
+            // Calcul de la rémunération totale du chauffeur.
             double driverPayment = (durationInMinutes / 60.0) * 30.0;
 
+            // Calcul du supplément catégorie.
             double categorySurcharge = 0.0;
             if (!carType.equals("Voiture classique")) {
                 if (carType.equals("Voiture Van")) {
@@ -289,7 +329,6 @@ public class HomeActivity extends AppCompatActivity {
                     categorySurcharge = 15.0;
                 }
             }
-            double totalCourseCost = driverPayment + categorySurcharge;
 
             return String.format("Durée estimée : %.2f minutes\n" +
                             "Distance estimée : %.2f km\n" +
@@ -297,33 +336,11 @@ public class HomeActivity extends AppCompatActivity {
                             "Rémunération totale du chauffeur : %.2f euros\n" +
                             "Supplément catégorie : %.2f euros\n" +
                             "Prix de la course : %.2f euros",
-                    durationInMinutes, distanceInKm, estimatedFuelUsage, driverPayment, categorySurcharge, totalCourseCost);
-        } catch (ApiException | InterruptedException | IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Erreur lors du calcul de la durée du trajet" + e.getMessage(), Toast.LENGTH_SHORT).show();
-            return "Erreur de justification";
+                    durationInMinutes, distanceInKm, estimatedFuelUsage, driverPayment, categorySurcharge, totalCost);
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "Erreur lors du calcul de la durée du trajet" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Erreur lors du calcul de la justification", Toast.LENGTH_SHORT).show();
             return "Erreur de justification";
-        }
-    }
-
-    private double getDurationInMinutes(String startPoint, String destination) {
-        try {
-            GeoApiContext geoApiContext = createGeoApiContext();
-            DirectionsResult result = DirectionsApi.newRequest(geoApiContext)
-                    .origin(startPoint)
-                    .destination(destination)
-                    .mode(TravelMode.DRIVING)
-                    .await();
-
-            long durationInSeconds = result.routes[0].legs[0].duration.inSeconds;
-            return durationInSeconds / 60.0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Erreur lors du calcul de la durée du trajet" +e.getMessage(), Toast.LENGTH_SHORT).show();
-            return 0.0;
         }
     }
 }
